@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html onkeypress="keypress(event)">
+<style>
+div {
+	border:4px solid black;
+    text-align:center;
+	width:1300px;
+	margin:auto;
+}
+div:nth-of-type(1) {
+	background-color:#ffff00;
+    height:100px;
+}
+div:nth-of-type(2) {
+	background-color:#00ffff;
+    height:500px;
+    margin:auto;
+}
+#div1 {
+	background-color:#ffffff;
+    height:455px;
+    width:630px;
+    position:relative;
+    left:1px;
+}
+h1 {
+	font-size:37px;
+}
+input {
+	width:500px;
+	background-color:#aaaaaa;
+	position:absolute;
+	top:400px;
+	right:60px;
+}
+#var {
+    color:#ffffff;
+}
+#line21 {
+    position:absolute;
+    right:230px;
+    top:340px;
+}
+</style>
+<body>
+<div>
+	<h1>Text Game</h1>
+</div>
+<div>
+	<br>
+	<div id="div1">
+    	<p id="line1"></p>
+        <p id="line2"></p>
+        <p id="line3"></p>
+        <p id="line4"></p>
+        <p id="line5"></p>
+        <p id="line6"></p>
+        <p id="line7"></p>
+        <p id="line8"></p>
+        <p id="line9"></p>
+        <p id="line10"></p>
+        <p id="line11"></p>
+        <p id="line12"></p>
+        <p id="line13"></p>
+        <p id="line14"></p>
+        <p id="line15"></p>
+        <p id="line16"></p>
+        <p id="line17"></p>
+        <p id="line18"></p>
+        <p id="line19"></p>
+        <p id="line20"></p>
+        <p id="line21"></p>
+    	<input type="text" id="input">
+    	<p id="test"></p>
+    </div>
+</div>
+<p id="var"></p>
+<script>
+var FloorNum = 1;
+var MonsterNum = 0;
+var MonsterName = "Monster";
+var MAttack;
+var MDef;
+var MSpd;
+var MMaxHP;
+var MHP;
+var Attack;
+var Speed;
+var Defence;
+var MaxHP;
+var HP;
+var lineNum;
+var Damage;
+var Waiting;
+var targ;
+var man = 1;
+var MStats = [];
+document.getElementById("line1").innerHTML = "What is your name?";
+document.getElementById("var").innerHTML = 0;
+    function keypress(event) {
+  var x = event.which || event.keyCode;
+  if (x == 13) {
+      var input = document.getElementById("input").value;
+      document.getElementById("input").value = "";
+      inputSplit(input);
+  } else {
+      switch (Waiting) {
+      case 1:
+          clearLines(3 + MonsterNum);
+          document.getElementById("input").value = "";
+          Waiting = 0;
+          lineNum = MonsterNum + 3;
+          document.getElementById("line" + lineNum).innerHTML = "Choose which " + MonsterName + " you'd like to attack.";
+          document.getElementById("var").innerHTML = 3;
+          break;
+      case 2:
+          clearLines(1);
+      	  FloorNum++;
+          Winer(0);
+          Waiting = 0;
+          /*dungeonFloor();*/
+      }
+  }
+  }
+  function inputSplit(x) {
+   var input = document.getElementById("var").innerHTML;
+   switch (parseInt(input)) {
+       case 0:
+   document.getElementById("line2").innerHTML = x + "? Great!";  
+   document.getElementById("line3").innerHTML = "now pick a class:";
+   document.getElementById("line4").innerHTML = "[1] Warrior   [2] Tank   [3] Thief";  
+   break;
+       case 1:
+        classSelect(x);
+   document.getElementById("line5").innerHTML = "Are you sure?   Yes or No"; 
+    break;  
+       case 2:
+           if (x == "yes") {
+           clearLines(1);
+           dungeonFloor();
+           } else {
+           document.getElementById("line5").innerHTML = "Then go ahead and repick.";
+           input = input - 2;
+           }
+           break;
+       case 3:
+           target(x);
+           break;
+       case 4:
+       	  Winer(x);
+           break;
+    default:
+   document.getElementById("line2").innerHTML = ":(";  
+   break;
+   }
+   input++;
+   document.getElementById("var").innerHTML = input;
+  }
+  function getRandInteger(min, max) {
+  return Math.floor(Math.random() * (max - min) ) + min;
+}
+  function classSelect(x) {
+      switch (x) {
+          case "1":
+              Attack = 10;
+              Defence = 6;
+              Speed = 4;
+              MaxHP = 30;
+              HP = 30;
+              break;
+          case "2":
+              Attack = 6;
+              Defence = 10;
+              Speed = 4;
+              MaxHP = 30;
+              HP = 30;
+              break;
+          case "3":
+              Attack = 6;
+              Defence = 4;
+              Speed = 10;
+              MaxHP = 30;
+              HP = 30;
+              break;
+      }
+    document.getElementById("line21").innerHTML = "STATS: Att: " + Attack + " Def: " + Defence + " Spd: " + Speed + " HP: " + HP + "/" + MaxHP;    
+  }
+  function clearLines(x) {
+      while (x < 21) {
+      document.getElementById("line" + x).innerHTML = "";
+      x++;
+      }
+  }
+  function dungeonGenerator() {
+    if (man == 0) {
+    MonsterNum = getRandInteger(1, Math.floor(2 + 0.4 * FloorNum));
+    } else {
+    MonsterNum = 1;
+    }
+  }
+  function dungeonFloor() {
+      document.getElementById("line1").innerHTML = "You're on Floor " + FloorNum + ".";
+      dungeonGenerator();
+      document.getElementById("line2").innerHTML = "You encounter " + MonsterNum + " " + MonsterName + "(s).";
+      lineNum = dungeonMonsters();
+      document.getElementById("line" + lineNum).innerHTML = "Choose which " + MonsterName + " you'd like to attack.";
+  }
+  function MonsterGen(x) {
+      if (man == 0) {
+    MAttack = getRandInteger(Math.floor(Attack / 2), Attack);
+    MDef = getRandInteger(Math.floor(Attack / 4), Attack - 1);
+    MSpd = getRandInteger(Math.floor(Speed / 2), Speed * 2);
+    MMaxHP = getRandInteger(Math.ceil(MaxHP / 2),Math.ceil(MaxHP * 1.5));
+    MHP = MMaxHP;
+      } else {
+    switch (FloorNum) {
+       case 1:
+    MAttack = 2;
+    MDef = 1;
+    MSpd = 1;
+    MMaxHP = 5;
+    MHP = 5;
+    break;
+       case 2:
+    MAttack = 4;
+    MDef = 1;
+    MSpd = 2;
+    MMaxHP = 8;
+    MHP = 8;
+    break;
+       case 3:
+    MAttack = 6;
+    MDef = 2;
+    MSpd = 3;
+    MMaxHP = 15;
+    MHP = 15;
+    man = 0;
+    break;
+    
+    }
+      }
+    MStats.push(MAttack);
+    MStats.push(MDef);
+    MStats.push(MSpd);
+    MStats.push(MMaxHP);
+    MStats.push(MHP);
+  }
+  function dungeonMonsters() {
+      var x = 3;
+      var y = MonsterNum;
+      var z = 1;
+      while (0 < y) {
+      MonsterGen(z);
+      document.getElementById("line" + x).innerHTML = MonsterName + " " + z + ":    Att: " + MAttack + "  Def: " + MDef + "  Spd: " + MSpd + "  HP: " + MHP + "/" + MMaxHP;
+      x++;
+      z++;
+      y = y - 1;
+  }
+  return x;
+  }
+  function MonHit() {
+      var x = 0;
+      while (MonsterNum != x) {
+          damageCalcM(x);
+          lineNum++;
+          x++;
+          document.getElementById("line" + lineNum).innerHTML = "You were hit by " + MonsterName + " " + x + " for " + Damage + " damage.";
+          HP = HP - Damage;
+          document.getElementById("line21").innerHTML = "STATS: Att: " + Attack + " Def: " + Defence + " Spd: " + Speed + " HP: " + HP + "/" + MaxHP; 
+      }
+      deathCheck();
+      if (Waiting == 0) {
+      lineNum++;
+      document.getElementById("line" + lineNum).innerHTML = "Press anything to continue.";
+      Waiting = 1;
+      }
+  }
+  function damageCalcP(y) {
+    var Mon = 5 * (y - 1);
+    var Dodge = getRandInteger(1, 100);
+    MAttack = MStats.slice(0 + Mon, 1 + Mon);
+    MDef = MStats.slice(1 + Mon, 2 + Mon);
+    MSpd = MStats.slice(2 + Mon, 3 + Mon);
+    MMaxHP = MStats.slice(3 + Mon, 4 + Mon);
+    MHP = MStats.slice(4 + Mon, 5 + Mon);
+    var x = MSpd;
+    while (x > 0) {
+        if (Dodge == x) {
+        Dodge = 101;
+        }
+        x--;
+    }
+    if (Dodge == 101) {
+        Damage = 0;
+    } else {
+    Damage = Math.ceil((Attack * 100 / MDef) / 100);
+  }
+  }
+    function damageCalcM(y) {
+    var Mon = 5 * (y - 1);
+    var Dodge = getRandInteger(1, 100);
+    MAttack = MStats.slice(0 + Mon, 1 + Mon);
+    MDef = MStats.slice(1 + Mon, 2 + Mon);
+    MSpd = MStats.slice(2 + Mon, 3 + Mon);
+    MMaxHP = MStats.slice(3 + Mon, 4 + Mon);
+    MHP = MStats.slice(4 + Mon, 5 + Mon);
+    var x = Speed;
+    while (x > 0) {
+        if (Dodge == x) {
+        Dodge = 101;
+        }
+        x--;
+    }
+    if (Dodge == 101) {
+        Damage = 0;
+    } else {
+    Damage = Math.ceil((MAttack * 100 / (Defence / 2)) / 100);
+  }
+  }
+  function target(x) {
+      targ = x;
+      document.getElementById("line" + lineNum).innerHTML = "You've selected " + MonsterName + " " + targ + ".";
+      lineNum++;
+      damageCalcP(targ);
+      document.getElementById("line" + lineNum).innerHTML = "You hit for " + Damage + " damage.";
+      var y = MStats.slice(4 + 5 * (x - 1),5 + 5 * (x - 1));
+      y = y - Damage;
+      MHP = y;
+      var z = parseInt(x) + 2;
+       document.getElementById("line" + z).innerHTML = MonsterName + " " + targ + ":    Att: " + MAttack + "  Def: " + MDef + "  Spd: " + MSpd + "  HP: " + MHP + "/" + MMaxHP;
+      MStats.splice(4 + 5 * (x - 1), 1, y);
+       MonHit();
+  }
+  function deathCheck() {
+      if (HP < 1) {
+          clearLines(1);
+          document.getElementById("line1").innerHTML = "You Lost :(";
+          document.getElementById("line2").innerHTML = "To play again, click run!";
+      } else {
+      if (MHP < 1) {
+          lineNum++;
+          document.getElementById("line" + lineNum).innerHTML = "You killed " + MonsterName + " " + targ + "!!!";
+          document.getElementById("line" + (parseInt(targ) + 2)).innerHTML = "";
+       MonsterNum--;
+      }
+      }
+   if (MonsterNum == 0) {
+   lineNum++;
+   document.getElementById("line" + lineNum).innerHTML = "You Win!";
+   Waiting = 2;
+   lineNum++;
+   document.getElementById("line" + lineNum).innerHTML = "Press anything to continue.";
+   }
+  }
+  function Winer(x) {
+  var gain;
+  var type;
+  var AttGain;
+  var DefGain;
+  var SpdGain;
+  var HPGain;
+    if (x == 0) {
+  lineNum = 1;
+  HP = MaxHP;
+  AttGain = getRandInteger(1, 5 * Math.floor(FloorNum / 3));
+  DefGain = getRandInteger(1, 5 * Math.floor(FloorNum / 3));
+  SpdGain = getRandInteger(1, 5 * Math.floor(FloorNum / 3));
+  HPGain = getRandInteger(5, 40 * Math.floor(FloorNum / 3));
+  document.getElementById("line1").innerHTML = "From beating this floor, you gain a power!";
+  document.getElementById("line2").innerHTML = "[1] Attack + " + AttGain + "   [2] Defence + " + DefGain + "   [3] Speed + " + SpdGain + "   [4] Health + " + HPGain;
+  document.getElementById("line3").innerHTML = "Go ahead and pick one to add to your stats.";
+  } else {
+  switch (x) {
+  case 1:
+  Attack = Attack + AttGain;
+  gain = AttGain;
+  type = "Attack";
+  break;
+  case 2:
+  Defence = Defence + DefGain;
+  gain = DefGain;
+  type = "Defence";
+  break;
+  case 3:
+  Speed = Speed + SpdGain;
+  gain = SpdGain;
+  type = "Speed";
+  break;
+  case 4:
+  MaxHP = MaxHP + HPGain;
+  HP = MaxHP;
+  gain = HPGain;
+  type = "HP";
+  break;
+  }
+  document.getElementById("line2").innerHTML = "You gained " + gain + " " + type + " Points!"; 
+  }
+  }
+</script>
+</body>
+</html>
+
+
+
+
+
+
